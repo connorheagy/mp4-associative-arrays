@@ -1,13 +1,15 @@
 package structures;
 
 import static java.lang.reflect.Array.newInstance;
+import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Arrays;
 
 /**
  * A basic implementation of Associative Arrays with keys of type K
  * and values of type V. Associative Arrays store key/value pairs
  * and permit you to look up values by key.
  *
- * @author Your Name Here
+ * @author Connor Heagy
  * @author Samuel A. Rebelsky
  */
 public class AssociativeArray<K, V> {
@@ -57,14 +59,40 @@ public class AssociativeArray<K, V> {
    * Create a copy of this AssociativeArray.
    */
   public AssociativeArray<K, V> clone() {
-    return null; // STUB
+    AssociativeArray<K,V> copyArr = new AssociativeArray<K, V>();
+    if (this.size == 0) {
+      return null;
+    }
+    for (int i = 0; i < this.size; i++) {
+      try {
+        copyArr.set(pairs[i].key, pairs[i].value);
+      } catch (Exception e) {
+        fail("clone method is not working correctly");}
+    }
+    return copyArr;
   } // clone()
 
   /**
    * Convert the array to a string.
    */
   public String toString() {
-    return "{}"; // STUB
+    String[] arr = new String [this.size];
+    if (this.size == 0)
+      {return "{}";}
+    else if (this.size == 1) {
+      return "{ " + pairs[0].key.toString() + ": " + pairs[0].value.toString() + " }";
+    }
+      for (int i = 0; i < this.size; i++) {
+        if (i == 0) {
+          arr[i] = "{ " + pairs[i].key.toString() + ": " + pairs[i].value.toString();
+        }
+        else if (i == this.size - 1) {
+          arr[i] = pairs[i].key.toString() + ": " + pairs[i].value.toString() + " }";
+        }
+        else
+        {arr[i] = pairs[i].key.toString() + ": " + pairs[i].value.toString();}
+      }
+      return String.join(", ", arr);
   } // toString()
 
   // +----------------+----------------------------------------------
@@ -76,7 +104,25 @@ public class AssociativeArray<K, V> {
    * get(key) will return value.
    */
   public void set(K key, V value) throws NullKeyException {
-    // STUB
+    if (this.size == 16) {
+      expand();}
+    if (key == null) {
+      throw new NullKeyException();}
+    else if (hasKey(key) == false) {
+      if (this.size == 16) {
+        expand();
+      }
+      pairs[this.size++] = new KVPair<K,V>(key, value);
+    }
+    else
+      {for (int i = 0; i < this.size; i++) {
+        if (this.size == 16) {
+          expand();
+        }
+        if (pairs[i].key.equals(key))
+          {pairs[i].value = value;}
+      }
+    }
   } // set(K,V)
 
   /**
@@ -87,7 +133,14 @@ public class AssociativeArray<K, V> {
    *                              appear in the associative array.
    */
   public V get(K key) throws KeyNotFoundException {
-    return null; // STUB
+    if (size == 0) {
+      throw new KeyNotFoundException();
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        return pairs[i].value;} // if
+      } // for
+    return null;
   } // get(K)
 
   /**
@@ -95,7 +148,11 @@ public class AssociativeArray<K, V> {
    * return false for the null key.
    */
   public boolean hasKey(K key) {
-    return false; // STUB
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key))
+        {return true;}
+    }
+    return false;
   } // hasKey(K)
 
   /**
@@ -104,7 +161,21 @@ public class AssociativeArray<K, V> {
    * in the associative array, does nothing.
    */
   public void remove(K key) {
-    // STUB
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        for (int j = i; j < this.size; j++) {
+          if (j == this.size - 1) {
+            pairs[j].key = null;
+            pairs[j].value = null;
+          }
+          else {
+          pairs[j].value = pairs[j + 1].value;
+          pairs[j].key = pairs[j + 1].key;}
+        }
+        this.size--;
+      }
+    }
+   
   } // remove(K)
 
   /**
@@ -130,7 +201,17 @@ public class AssociativeArray<K, V> {
    * If no such entry is found, throws an exception.
    */
   int find(K key) throws KeyNotFoundException {
-    throw new KeyNotFoundException();   // STUB
+    int index = 0;
+    if (hasKey(key) == false) {
+      throw new KeyNotFoundException(); 
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        index = i;
+        break;
+      }
+    }
+    return index;
   } // find(K)
 
 } // class AssociativeArray
